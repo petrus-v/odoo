@@ -745,9 +745,9 @@ class mail_message(osv.Model):
             context = {}
         default_starred = context.pop('default_starred', False)
         if not values.get('message_id') and values.get('res_id') and values.get('model'):
-            values['message_id'] = tools.generate_tracking_message_id('%(res_id)s-%(model)s' % values)
+            values['message_id'] = tools.generate_tracking_message_id('%(res_id)s-%(model)s' % values, cr, uid)
         elif not values.get('message_id'):
-            values['message_id'] = tools.generate_tracking_message_id('private')
+            values['message_id'] = tools.generate_tracking_message_id('private', cr, uid)
         newid = super(mail_message, self).create(cr, uid, values, context)
         self._notify(cr, uid, newid, context=context)
         # TDE FIXME: handle default_starred. Why not setting an inv on starred ?
