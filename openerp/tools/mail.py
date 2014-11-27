@@ -25,6 +25,7 @@ import logging
 import lxml.html
 import lxml.html.clean as clean
 import openerp.pooler as pooler
+from openerp import SUPERUSER_ID
 import random
 import re
 import socket
@@ -328,7 +329,7 @@ def generate_tracking_message_id(res_id, cr=None, uid=None):
         else:
             raise Exception("No database cursor found, please pass one explicitly")
     icp = pooler.get_pool(cr.dbname).get('ir.config_parameter')
-    tracking_domain = icp.get_param(cr, uid or 1, 'mail.catchall.domain')
+    tracking_domain = icp.get_param(cr, SUPERUSER_ID, 'mail.catchall.domain')
     try:
         rnd = random.SystemRandom().random()
     except NotImplementedError:
