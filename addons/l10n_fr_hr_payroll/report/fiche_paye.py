@@ -48,6 +48,7 @@ class fiche_paye_parser(report_sxw.rml_parse):
 
 
     def get_total_by_rule_category(self, obj, code):
+        print code
         payslip_line = self.pool.get('hr.payslip.line')
         rule_cate_obj = self.pool.get('hr.salary.rule.category')
 
@@ -55,10 +56,12 @@ class fiche_paye_parser(report_sxw.rml_parse):
 
         category_total = 0
         if cate_ids:
-            line_ids = payslip_line.search(self.cr, self.uid, [('slip_id', '=', obj.id),('category_id.id', '=', cate_ids[0] )])
+            line_ids = payslip_line.search(self.cr, self.uid, [('slip_id', '=', obj.id),('category_id.id', 'child_of', cate_ids[0] )])
             for line in payslip_line.browse(self.cr, self.uid, line_ids):
-                 category_total += line.total
+                print line.total
+                category_total += line.total
 
+        print '= %s' % category_total
         return category_total
 
 
