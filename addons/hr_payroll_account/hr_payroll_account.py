@@ -101,7 +101,6 @@ class hr_payslip(osv.osv):
             else:
                 period_id = slip.period_id.id
 
-            default_partner_id = slip.employee_id.address_home_id.id
             name = _('Payslip of %s') % (slip.employee_id.name)
             move = {
                 'narration': name,
@@ -114,16 +113,18 @@ class hr_payslip(osv.osv):
                 amt = slip.credit_note and -line.total or line.total
                 if float_is_zero(amt, precision_digits=precision):
                     continue
-                partner_id = line.salary_rule_id.register_id.partner_id and line.salary_rule_id.register_id.partner_id.id or default_partner_id
+                partner_id = False
                 # choose the account to create the debit move
                 if (line.salary_rule_id.debit_employee_account == 'receivable'
                         and slip.employee_id.address_home_id
                         and slip.employee_id.address_home_id.property_account_receivable):
                     debit_account_id = slip.employee_id.address_home_id.property_account_receivable.id
+                    partner_id = slip.employee_id.address_home_id.id
                 elif (line.salary_rule_id.debit_employee_account == 'payable'
                         and slip.employee_id.address_home_id
                         and slip.employee_id.address_home_id.property_account_payable):
                     debit_account_id = slip.employee_id.address_home_id.property_account_payable.id
+                    partner_id = slip.employee_id.address_home_id.id
                 else:
                     debit_account_id = line.salary_rule_id.account_debit.id
                 # choose the account to create the credit move
@@ -131,6 +132,7 @@ class hr_payslip(osv.osv):
                         and slip.employee_id.address_home_id
                         and slip.employee_id.address_home_id.property_account_payable):
                     credit_account_id = slip.employee_id.address_home_id.property_account_payable.id
+                    partner_id = slip.employee_id.address_home_id.id
                 elif (line.salary_rule_id.credit_employee_account == 'receivable'
                         and slip.employee_id.address_home_id
                         and slip.employee_id.address_home_id.property_account_receivable):
@@ -142,7 +144,7 @@ class hr_payslip(osv.osv):
                     debit_line = (0, 0, {
                     'name': line.name,
                     'date': timenow,
-                    'partner_id': (line.salary_rule_id.register_id.partner_id or line.salary_rule_id.account_debit.type in ('receivable', 'payable')) and partner_id or False,
+                    'partner_id': partner_id,
                     'account_id': debit_account_id,
                     'journal_id': slip.journal_id.id,
                     'period_id': period_id,
@@ -159,7 +161,7 @@ class hr_payslip(osv.osv):
                     credit_line = (0, 0, {
                     'name': line.name,
                     'date': timenow,
-                    'partner_id': (line.salary_rule_id.register_id.partner_id or line.salary_rule_id.account_credit.type in ('receivable', 'payable')) and partner_id or False,
+                    'partner_id': partner_id,
                     'account_id': credit_account_id,
                     'journal_id': slip.journal_id.id,
                     'period_id': period_id,
