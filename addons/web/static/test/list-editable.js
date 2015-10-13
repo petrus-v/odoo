@@ -385,15 +385,12 @@ openerp.testing.section('list.edition.focus', {
                 l.start_edition(l.records.get(1));
             })
             .then(function () {
-                if(navigator.userAgent.indexOf('Firefox') >= 0){
-                    //pass this test on FireFox while the following issue still
-                    //open: https://bugzilla.mozilla.org/show_bug.cgi?id=85686
-                    ok(true);
-                }else{
-                    strictEqual(window.getSelection().toString(), 'foo',
-                                "Text in char field must be selected");
-                }
-                strictEqual(document.activeElement, $fix.find('input')[0]);
+                var input =  $fix.find('input')[0];
+                strictEqual(document.activeElement, input);
+                strictEqual(input.value.substring(input.selectionStart,
+                                                  input.selectionEnd),
+                            'foo',
+                            "Text in char field must be selected");
             });
     });
   test('edition focus boolean field', {asserts: 1}, function (instance, $fix, mock) {
