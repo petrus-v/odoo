@@ -37,5 +37,5 @@
     backorder = shipment.backorder_id
     assert backorder, "Backorder should be created after partial shipment."
     assert backorder.state == 'done', "Backorder should be close after received"
-    assert backorder.carrier_tracking_ref ==  'ABC12345', 'wrong tracking ref on done picking'
+    assert backorder.carrier_tracking_ref != 'ABC12345', 'wrong tracking ref on done picking'
     assert not shipment.carrier_tracking_ref, 'remaining picking must have no tracking ref'
