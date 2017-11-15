@@ -127,7 +127,7 @@ class SaleOrder(models.Model):
 
     pricelist_id = fields.Many2one('product.pricelist', string='Pricelist', required=True, readonly=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, help="Pricelist for current sales order.")
     currency_id = fields.Many2one("res.currency", related='pricelist_id.currency_id', string="Currency", readonly=True, required=True)
-    project_id = fields.Many2one('account.analytic.account', 'Analytic Account', readonly=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, help="The analytic account related to a sales order.", copy=False, index=True, domain=[('account_type', '=', 'normal')])
+    project_id = fields.Many2one('account.analytic.account', 'Analytic Account', readonly=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, help="The analytic account related to a sales order.", copy=False, domain=[('account_type', '=', 'normal')])
 
     order_line = fields.One2many('sale.order.line', 'order_id', string='Order Lines', states={'cancel': [('readonly', True)], 'done': [('readonly', True)]}, copy=True)
 
@@ -360,11 +360,11 @@ class SaleOrder(models.Model):
             'state': 'draft',
             'procurement_group_id': False,
         })
-        return orders.mapped('order_line').mapped('procurement_ids').write({'sale_line_id': False})
+        orders.mapped('order_line').mapped('procurement_ids').write({'sale_line_id': False})
 
     @api.multi
     def action_cancel(self):
-        return self.write({'state': 'cancel'})
+        self.write({'state': 'cancel'})
 
     @api.multi
     def action_quotation_send(self):
@@ -413,7 +413,7 @@ class SaleOrder(models.Model):
 
     @api.multi
     def action_done(self):
-        return self.write({'state': 'done'})
+        self.write({'state': 'done'})
 
     @api.model
     def _prepare_procurement_group(self):
@@ -792,7 +792,7 @@ class SaleOrderLine(models.Model):
                 lang=self.order_id.partner_id.lang,
                 partner=self.order_id.partner_id.id,
                 quantity=self.product_uom_qty,
-                date=self.order_id.date_order,
+                date_order=self.order_id.date_order,
                 pricelist=self.order_id.pricelist_id.id,
                 uom=self.product_uom.id,
                 fiscal_position=self.env.context.get('fiscal_position')

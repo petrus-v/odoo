@@ -35,7 +35,7 @@ from openerp.tools import ustr
 from openerp.tools.misc import str2bool, xlwt
 from openerp import http
 from openerp.http import request, serialize_exception as _serialize_exception, content_disposition
-from openerp.exceptions import AccessError, UserError
+from openerp.exceptions import AccessError
 
 _logger = logging.getLogger(__name__)
 
@@ -467,11 +467,10 @@ class Home(http.Controller):
             request.uid = openerp.SUPERUSER_ID
 
         values = request.params.copy()
-        values['mono_db'] = len(http.db_list(True, request.httprequest)) == 1
         try:
             values['databases'] = http.db_list()
         except openerp.exceptions.AccessDenied:
-            values['databases'] = [request.session.db]
+            values['databases'] = None
 
         if request.httprequest.method == 'POST':
             old_uid = request.uid
@@ -1420,9 +1419,6 @@ class ExcelExport(ExportFormat, http.Controller):
         return base + '.xls'
 
     def from_data(self, fields, rows):
-        if len(rows) > 65535:
-            raise UserError(_('There are too many rows (%s rows, limit: 65535) to export as Excel 97-2003 (.xls) format. Consider splitting the export.') % len(rows))
-
         workbook = xlwt.Workbook()
         worksheet = workbook.add_sheet('Sheet 1')
 

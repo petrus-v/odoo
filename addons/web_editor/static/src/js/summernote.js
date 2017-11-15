@@ -550,13 +550,6 @@ dom.removeBetween = function (sc, so, ec, eo, towrite) {
         so = 0;
         eo = 1;
     }
-
-    var parentNode = sc && sc.parentNode;
-    if (parentNode && sc.tagName === 'BR') {
-        sc = parentNode;
-        ec = parentNode;
-    }
-
     return {
         sc: sc,
         so: so,
@@ -1171,9 +1164,9 @@ $.summernote.pluginEvents.visible = function (event, editor, layoutInfo) {
     if (!r) return;
 
     if (!r.isCollapsed()) {
-        if ((dom.isCell(dom.node(r.sc)) || dom.isCell(dom.node(r.ec))) && dom.node(r.sc) !== dom.node(r.ec)) {
+        if (dom.isCell(dom.node(r.sc)) || dom.isCell(dom.node(r.ec))) {
             remove_table_content(r);
-            r = range.create(r.ec, 0);
+            r = range.create(r.ec, 0).select();
         } else {
             r = r.deleteContents(true);
         }

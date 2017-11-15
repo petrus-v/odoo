@@ -98,9 +98,7 @@ return Widget.extend({
             }));
         } else {
             var chart = this['display_' + this.mode]();
-            if (chart) {
-                chart.tooltip.chartContainer(this.$el[0]);
-            }
+            chart.tooltip.chartContainer(this.$el[0]);
         }
     },
     display_bar: function () {

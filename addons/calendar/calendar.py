@@ -975,7 +975,6 @@ class calendar_event(osv.Model):
     def onchange_allday(self, cr, uid, ids, start=False, end=False, starttime=False, endtime=False, startdatetime=False, enddatetime=False, checkallday=False, context=None):
 
         value = {}
-        context = context or {}
 
         if not ((starttime and endtime) or (start and end)):  # At first intialize, we have not datetime
             return value
@@ -984,18 +983,12 @@ class calendar_event(osv.Model):
             startdatetime = startdatetime or start
             if startdatetime:
                 start = datetime.strptime(startdatetime, DEFAULT_SERVER_DATETIME_FORMAT)
-                if context.get('default_allday'):
-                    value['start_date'] = datetime.strftime(start, DEFAULT_SERVER_DATE_FORMAT)
-                else:
-                    value['start_date'] = fields.date.context_today(self, cr, uid, context=context, timestamp=start)
+                value['start_date'] = fields.date.context_today(self, cr, uid, context=context, timestamp=start)
 
             enddatetime = enddatetime or end
             if enddatetime:
                 end = datetime.strptime(enddatetime, DEFAULT_SERVER_DATETIME_FORMAT)
-                if context.get('default_allday'):
-                    value['stop_date'] = datetime.strftime(end, DEFAULT_SERVER_DATE_FORMAT)
-                else:
-                    value['stop_date'] = fields.date.context_today(self, cr, uid, context=context, timestamp=end)
+                value['stop_date'] = fields.date.context_today(self, cr, uid, context=context, timestamp=end)
         else:  # from date to datetime
             user = self.pool['res.users'].browse(cr, uid, uid, context)
             tz = pytz.timezone(user.tz) if user.tz else pytz.utc

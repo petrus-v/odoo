@@ -5,8 +5,6 @@
 
 from openerp import models, fields, api, _
 from openerp.exceptions import Warning
-from datetime import datetime
-from openerp.tools import DEFAULT_SERVER_DATE_FORMAT
 import base64
 import StringIO
 import csv
@@ -34,7 +32,7 @@ class AccountFrFec(models.TransientModel):
         SELECT
             'OUV' AS JournalCode,
             'Balance initiale' AS JournalLib,
-            'OUVERTURE/' || %s AS EcritureNum,
+            'Balance initiale PL' AS EcritureNum,
             %s AS EcritureDate,
             '120/129' AS CompteNum,
             'Benefice (perte) reporte(e)' AS CompteLib,
@@ -68,10 +66,8 @@ class AccountFrFec(models.TransientModel):
             '''
         company = self.env.user.company_id
         formatted_date_from = self.date_from.replace('-', '')
-        date_from = datetime.strptime(self.date_from, DEFAULT_SERVER_DATE_FORMAT)
-        formatted_date_year = date_from.year
         self._cr.execute(
-            sql_query, (formatted_date_year, formatted_date_from, formatted_date_from, formatted_date_from, self.date_from, company.id))
+            sql_query, (formatted_date_from, formatted_date_from, formatted_date_from, self.date_from, company.id))
         listrow = []
         row = self._cr.fetchone()
         listrow = list(row)
@@ -133,7 +129,7 @@ class AccountFrFec(models.TransientModel):
         SELECT
             'OUV' AS JournalCode,
             'Balance initiale' AS JournalLib,
-            'OUVERTURE/' || %s AS EcritureNum,
+            'Balance initiale ' || MIN(aa.name) AS EcritureNum,
             %s AS EcritureDate,
             MIN(aa.code) AS CompteNum,
             replace(MIN(aa.name), '|', '/') AS CompteLib,
@@ -173,10 +169,8 @@ class AccountFrFec(models.TransientModel):
         HAVING sum(aml.balance) != 0
         '''
         formatted_date_from = self.date_from.replace('-', '')
-        date_from = datetime.strptime(self.date_from, DEFAULT_SERVER_DATE_FORMAT)
-        formatted_date_year = date_from.year
         self._cr.execute(
-            sql_query, (formatted_date_year, formatted_date_from, formatted_date_from, formatted_date_from, self.date_from, company.id))
+            sql_query, (formatted_date_from, formatted_date_from, formatted_date_from, self.date_from, company.id))
 
         for row in self._cr.fetchall():
             listrow = list(row)

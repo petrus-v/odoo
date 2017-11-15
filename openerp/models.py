@@ -4892,8 +4892,7 @@ class BaseModel(object):
                                      if f not in default
                                      if f not in blacklist)
 
-        # Pass load=_classic_write to avoid useless name_get() calls
-        data = self.read(cr, uid, [id], fields_to_copy.keys(), load='_classic_write', context=context)
+        data = self.read(cr, uid, [id], fields_to_copy.keys(), context=context)
         if data:
             data = data[0]
         else:
@@ -4901,7 +4900,9 @@ class BaseModel(object):
 
         res = dict(default)
         for f, field in fields_to_copy.iteritems():
-            if field.type == 'one2many':
+            if field.type == 'many2one':
+                res[f] = data[f] and data[f][0]
+            elif field.type == 'one2many':
                 other = self.pool[field.comodel_name]
                 # duplicate following the order of the ids because we'll rely on
                 # it later for copying translations in copy_translation()!
@@ -5786,19 +5787,16 @@ class BaseModel(object):
         return RecordCache(self)
 
     @api.model
-    def _in_cache_without(self, field, limit=PREFETCH_MAX):
-        """ Return records to prefetch that have no value in cache for ``field``
-            (:class:`Field` instance), including ``self``.
-            Return at most ``limit`` records.
+    def _in_cache_without(self, field):
+        """ Make sure ``self`` is present in cache (for prefetching), and return
+            the records of model ``self`` in cache that have no value for ``field``
+            (:class:`Field` instance).
         """
         env = self.env
         prefetch_ids = env.prefetch[self._name]
         prefetch_ids.update(self._ids)
         ids = filter(None, prefetch_ids - set(env.cache[field]))
-        recs = self.browse(ids)
-        if limit and len(recs) > limit:
-            recs = self + (recs - self)[:(limit - len(self))]
-        return recs
+        return self.browse(ids)
 
     @api.model
     def refresh(self):
