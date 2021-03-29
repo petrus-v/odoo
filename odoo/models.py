@@ -4192,8 +4192,11 @@ Fields:
                 if not (update and d_noupdate):
                     to_update.append(data)
             else:
-                imd.browse(d_id).unlink()
-                to_create.append(data)
+                # PV: if users decide to remove records I trust them
+                # do not recreate if "noupdate"
+                if not data["noupdate"]:
+                    imd.browse(d_id).unlink()
+                    to_create.append(data)
 
         # update existing records
         for data in to_update:
