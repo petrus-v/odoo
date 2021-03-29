@@ -4194,9 +4194,12 @@ Fields:
             else:
                 # PV: if users decide to remove records I trust them
                 # do not recreate if "noupdate"
-                if not data["noupdate"]:
+                if data["noupdate"]:
+                    data['record'] = None
+                else:
                     imd.browse(d_id).unlink()
                     to_create.append(data)
+                # PV: end overwrite
 
         # update existing records
         for data in to_update:
@@ -4227,7 +4230,9 @@ Fields:
 
         # create or update XMLIDs
         imd._update_xmlids(imd_data_list, update)
-
+        # PV: change avoid recrete unlink `noupdate="True" data`
+        data_list = [data for data in data_list if data.get("record", None)]
+        # PV: end-change
         return original_self.concat(*(data['record'] for data in data_list))
 
     # TODO: ameliorer avec NULL
