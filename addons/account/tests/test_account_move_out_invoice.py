@@ -2941,13 +2941,13 @@ class TestAccountMoveOutInvoiceOnchanges(AccountTestInvoicingCommon):
         accrual_lines = self.env['account.move'].browse(wizard_res['domain'][0][2]).line_ids.sorted('date')
         self.assertRecordValues(accrual_lines, [
             {'amount_currency': 600.0,  'debit': 300.0, 'credit': 0.0,      'account_id': self.product_line_vals_1['account_id'],   'reconciled': False},
-            {'amount_currency': -600.0, 'debit': 0.0,   'credit': 300.0,    'account_id': wizard.revenue_accrual_account.id,        'reconciled': False},
+            {'amount_currency': -600.0, 'debit': 0.0,   'credit': 300.0,    'account_id': wizard.revenue_accrual_account.id,        'reconciled': True},
             {'amount_currency': 120.0,  'debit': 60.0,  'credit': 0.0,      'account_id': self.product_line_vals_2['account_id'],   'reconciled': False},
-            {'amount_currency': -120.0, 'debit': 0.0,   'credit': 60.0,     'account_id': wizard.revenue_accrual_account.id,        'reconciled': False},
+            {'amount_currency': -120.0, 'debit': 0.0,   'credit': 60.0,     'account_id': wizard.revenue_accrual_account.id,        'reconciled': True},
             {'amount_currency': -600.0, 'debit': 0.0,   'credit': 300.0,    'account_id': self.product_line_vals_1['account_id'],   'reconciled': False},
-            {'amount_currency': 600.0,  'debit': 300.0, 'credit': 0.0,      'account_id': wizard.revenue_accrual_account.id,        'reconciled': False},
+            {'amount_currency': 600.0,  'debit': 300.0, 'credit': 0.0,      'account_id': wizard.revenue_accrual_account.id,        'reconciled': True},
             {'amount_currency': -120.0, 'debit': 0.0,   'credit': 60.0,     'account_id': self.product_line_vals_2['account_id'],   'reconciled': False},
-            {'amount_currency': 120.0,  'debit': 60.0,  'credit': 0.0,      'account_id': wizard.revenue_accrual_account.id,        'reconciled': False},
+            {'amount_currency': 120.0,  'debit': 60.0,  'credit': 0.0,      'account_id': wizard.revenue_accrual_account.id,        'reconciled': True},
         ])
 
     def test_out_invoice_multi_date_change_period_accrual(self):

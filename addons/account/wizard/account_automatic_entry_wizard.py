@@ -318,7 +318,7 @@ class AutomaticEntryWizard(models.TransientModel):
         accrual_account = self.revenue_accrual_account if self.account_type == 'income' else self.expense_accrual_account
 
         created_moves = self.env['account.move'].create(move_vals)
-        created_moves._post()
+        created_moves._post(soft=False)
 
         destination_move = created_moves[0]
         destination_move_offset = 0
@@ -329,7 +329,7 @@ class AutomaticEntryWizard(models.TransientModel):
             amount = sum((self.move_line_ids._origin & move.line_ids).mapped('balance'))
             accrual_move = created_moves[1:].filtered(lambda m: m.date == move.date)
 
-            if accrual_account.reconcile and destination_move.state == 'posted':
+            if accrual_account.reconcile:
                 destination_move_lines = destination_move.mapped('line_ids').filtered(lambda line: line.account_id == accrual_account)[destination_move_offset:destination_move_offset+2]
                 destination_move_offset += 2
                 accrual_move_lines = accrual_move.mapped('line_ids').filtered(lambda line: line.account_id == accrual_account)[accrual_move_offsets[accrual_move]:accrual_move_offsets[accrual_move]+2]
@@ -362,7 +362,7 @@ class AutomaticEntryWizard(models.TransientModel):
 
     def _do_action_change_account(self, move_vals):
         new_move = self.env['account.move'].create(move_vals)
-        new_move._post()
+        new_move._post(soft=False)
 
         # Group lines
         grouped_lines = defaultdict(lambda: self.env['account.move.line'])
